@@ -12,7 +12,6 @@ async function observeImaxScreeningDates() {
     const page = await browser.newPage();
     const url = 'https://www.uci-kinowelt.de/kinoprogramm/berlin-east-side-gallery/82/poster';
 
-    observationCycle();
     intervalId = setInterval(observationCycle, 1 * 60 * 1000);
 
     async function observationCycle() {
@@ -141,7 +140,8 @@ function alertAdmin(error) {
 }
 
 function notifyUsers(message) {
-    process.env.USER_MAILS.forEach((mail) => sendMail(mail, 'new imax screenings available', 'IMAX screenings are now available between 11.04.2024 and 17.04.2024.\nCheck https://www.uci-kinowelt.de/kinoprogramm/berlin-east-side-gallery/82/poster for further details.'));
+    const USER_MAILS = JSON.parse(process.env.USER_MAILS);
+    USER_MAILS.forEach((mail) => sendMail(mail, 'new imax screenings available', 'IMAX screenings are now available between 11.04.2024 and 17.04.2024.\nCheck https://www.uci-kinowelt.de/kinoprogramm/berlin-east-side-gallery/82/poster for further details.'));
 }
 
 function sendMail(recipient, subject, text) {
