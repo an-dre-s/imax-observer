@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.13",
+    "puppeteer": "^22.6.3"
+  },
+  "scripts": {
+    "start": "node observeImaxScreeningDates.js"
+  }
+}
