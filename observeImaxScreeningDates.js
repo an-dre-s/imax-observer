@@ -30,6 +30,7 @@ async function observeImaxScreeningDates() {
                 const desiredImaxScreeningDatesWithAvailabilityStatus = {};
                 
                 const tileIdentifier = /dune.*two/;
+                desiredImaxScreeningDates.push('20240410');
                 desiredImaxScreeningDates.push('20240411');
                 desiredImaxScreeningDates.push('20240412');
                 desiredImaxScreeningDates.push('20240413');
