@@ -148,7 +148,7 @@ function sendMail(recipient, subject, text) {
         service: 'gmail',
         auth: {
             user: process.env.BOT_MAIL,
-            pass: process.env.BOT_CREDENTIALS;
+            pass: process.env.BOT_CREDENTIALS
         }
     });
 
