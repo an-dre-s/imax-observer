@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer');
 const nodemailer = require('nodemailer');
 
-let hour;
 let intervalId;
 
 async function observeImaxScreeningDates() {
@@ -12,7 +11,7 @@ async function observeImaxScreeningDates() {
     const page = await browser.newPage();
     const url = 'https://www.uci-kinowelt.de/kinoprogramm/berlin-east-side-gallery/82/poster';
 
-    intervalId = setInterval(observationCycle, 1 * 60 * 1000);
+    intervalId = setInterval(observationCycle, 5 * 1 * 1000);
 
     async function observationCycle() {
         try {
@@ -20,26 +19,14 @@ async function observeImaxScreeningDates() {
             
             console.log(String(new Date()));
 
-            const desiredImaxScreeningDatesWithAvailabilityStatus = await page.evaluate(() => {
+            const tile = await page.evaluate(() => {
                 let tile;
-                let filmId;
-                const desiredImaxScreeningDates = [];
-                const desiredImaxScreeningDatesWithAvailabilityStatus = {};
-                
+
                 const tileIdentifier = /dune.*two/;
 
-                prepareLookup();
-                lookupAvailabilityStatusOfDesiredImaxScreeningDates();
+                retrieveTile();
+                return tile;
 
-                return desiredImaxScreeningDatesWithAvailabilityStatus;
-
-
-                function prepareLookup() {
-                    retrieveTile();
-                    retrieveFilmId();
-                    openModalForScreeningDates();
-                }
-                
                 function retrieveTile() {
                     $('.posterline--box').each(function () {
                         if($(this).find('h3').text().toLowerCase().match(tileIdentifier)) {
@@ -47,49 +34,13 @@ async function observeImaxScreeningDates() {
                             return false;
                         }
                     });
-
-                    if(!tile) {
-                        throw new Error('could not find tile');
-                    }
-                }
-
-                function retrieveFilmId() {
-                    filmId = $(tile).attr('data-film-id');
-
-                    if(!filmId) {
-                        throw new Error('could not find film id');
-                    }
-                }
-
-                function openModalForScreeningDates() {
-                    $(tile).trigger('click');
-
-                    const isModalOpen = !($('#poster-performance-container').css('display') === 'none');
-                    if(!isModalOpen) {
-                        throw new Error('could not open modal for screening dates');
-                    } 
-                }
-
-                function lookupAvailabilityStatusOfDesiredImaxScreeningDates() {
-                    desiredImaxScreeningDates.forEach((desiredImaxScreeningDate) => desiredImaxScreeningDatesWithAvailabilityStatus[desiredImaxScreeningDate] = isDesiredImaxScreeningDateAvailable(desiredImaxScreeningDate));
-                }
-
-                function isDesiredImaxScreeningDateAvailable(desiredImaxScreeningDate) {
-                    const imaxScreeningsOnDesiredDate = $(`#poster-performance-container .eventkalender--item[film-id="${filmId}"] tr.schedule-container-date[data-date="${desiredImaxScreeningDate}"] .imax`)
-                    return imaxScreeningsOnDesiredDate.length > 0;
                 }
             });
-            
-            const availabilityStatusOfDesiredImaxScreeningDates = buildStringFromDesiredImaxScreeningDatesWithAvailabilityStatus(desiredImaxScreeningDatesWithAvailabilityStatus);
-            console.log(availabilityStatusOfDesiredImaxScreeningDates);
-            notifyUsersAndExitIfDesiredImaxScreeningDatesAreAvailable();
 
-
-            function notifyUsersAndExitIfDesiredImaxScreeningDatesAreAvailable() {
-                if (Object.values(desiredImaxScreeningDatesWithAvailabilityStatus).includes(true)) {
-                    notifyUsers(availabilityStatusOfDesiredImaxScreeningDates);
-                    clearInterval(intervalId);
-                }
+            if(tile) {
+                notifyUsers();
+                console.log('Fury Road tile has been spotted.')
+                clearInterval(intervalId);
             }
         } catch(exception) {
             alertAdmin(exception);
@@ -104,26 +55,14 @@ function stopPreviousObservation() {
     }
 }
 
-function buildStringFromDesiredImaxScreeningDatesWithAvailabilityStatus(desiredImaxScreeningDatesWithAvailabilityStatus) {
-    const results = [];
-    for (const desiredImaxScreeningDate in desiredImaxScreeningDatesWithAvailabilityStatus) {
-        if (desiredImaxScreeningDatesWithAvailabilityStatus[desiredImaxScreeningDate]) {
-            results.push(`date ${desiredImaxScreeningDate} is available`);
-        } else {
-            results.push(`date ${desiredImaxScreeningDate} is not available`);
-        }
-    }
-    return results.join('\n');
-}
-
 function alertAdmin(error) {
     console.error(error);
     sendMail(process.env.ADMIN_MAIL, 'error in IMAX screening dates observer', error.message)
 }
 
-function notifyUsers(message) {
+function notifyUsers() {
     const USER_MAILS = JSON.parse(process.env.USER_MAILS);
-    USER_MAILS.forEach((mail) => sendMail(mail, message));
+    USER_MAILS.forEach((mail) => sendMail(mail, 'fury road screenings available', 'Check https://www.uci-kinowelt.de/kinoprogramm/berlin-east-side-gallery/82/poster for further details.'));
 }
 
 function sendMail(recipient, subject, text) {
