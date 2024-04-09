@@ -123,7 +123,7 @@ function alertAdmin(error) {
 
 function notifyUsers(message) {
     const USER_MAILS = JSON.parse(process.env.USER_MAILS);
-    USER_MAILS.forEach((mail) => sendMail(mail, message));
+    USER_MAILS.forEach((mail) => sendMail(mail,'new imax screenings available', message));
 }
 
 function sendMail(recipient, subject, text) {
