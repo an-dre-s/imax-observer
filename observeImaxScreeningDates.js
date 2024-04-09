@@ -11,7 +11,7 @@ async function observeImaxScreeningDates() {
     const page = await browser.newPage();
     const url = 'https://www.uci-kinowelt.de/kinoprogramm/berlin-east-side-gallery/82/poster';
 
-    intervalId = setInterval(observationCycle, 5 * 1 * 1000);
+    intervalId = setInterval(observationCycle, 1 * 60 * 1000);
 
     async function observationCycle() {
         try {
@@ -22,7 +22,7 @@ async function observeImaxScreeningDates() {
             const tile = await page.evaluate(() => {
                 let tile;
 
-                const tileIdentifier = /dune.*two/;
+                const tileIdentifier = /fury.*road/;
 
                 retrieveTile();
                 return tile;
