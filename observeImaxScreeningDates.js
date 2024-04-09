@@ -16,8 +16,6 @@ async function observeImaxScreeningDates() {
 
     async function observationCycle() {
         try {
-            sendHeartbeat();
-
             await page.goto(url, { waitUntil: 'domcontentloaded' });
             
             console.log(String(new Date()));
@@ -110,14 +108,6 @@ async function observeImaxScreeningDates() {
 function stopPreviousObservation() {
     if (intervalId) {
         clearInterval(intervalId);
-    }
-}
-
-function sendHeartbeat() {
-    const lastHour = hour;
-    hour = new Date().getUTCHours();
-    if (lastHour !== hour) {
-        sendMail(process.env.ADMIN_MAIL, 'heartbeat', `Service is still running.\n${String(new Date())}`);
     }
 }
 
