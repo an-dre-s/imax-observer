@@ -7,11 +7,11 @@ async function observeImaxScreeningDates() {
     stopPreviousObservation();
     sendMail(process.env.ADMIN_MAIL,'service started', 'service has been started');
     
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({timeout: 60000});
     const page = await browser.newPage();
     const url = 'https://www.uci-kinowelt.de/kinoprogramm/berlin-east-side-gallery/82/poster';
 
-    intervalId = setInterval(observationCycle, 1 * 60 * 1000);
+    intervalId = setInterval(observationCycle, 2 * 60 * 1000);
 
     async function observationCycle() {
         try {
