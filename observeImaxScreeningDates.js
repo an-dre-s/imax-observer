@@ -130,7 +130,7 @@ function alertAdmin(error) {
 
 function notifyUsers(message) {
     const USER_MAILS = JSON.parse(process.env.USER_MAILS);
-    USER_MAILS.forEach((mail) => sendMail(mail, 'new imax screenings available', 'IMAX screenings are now available between 11.04.2024 and 17.04.2024.\nCheck https://www.uci-kinowelt.de/kinoprogramm/berlin-east-side-gallery/82/poster for further details.'));
+    USER_MAILS.forEach((mail) => sendMail(mail, message));
 }
 
 function sendMail(recipient, subject, text) {
