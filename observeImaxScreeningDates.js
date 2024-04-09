@@ -39,8 +39,11 @@ async function observeImaxScreeningDates() {
 
             if(tile) {
                 notifyUsers();
-                console.log('Fury Road tile has been spotted.')
+                console.log('fury road tile has been found')
                 clearInterval(intervalId);
+            } else {
+                console.log('could not find fury road tile')
+
             }
         } catch(exception) {
             alertAdmin(exception);
