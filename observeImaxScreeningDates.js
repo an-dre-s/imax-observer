@@ -27,13 +27,6 @@ async function observeImaxScreeningDates() {
                 const desiredImaxScreeningDatesWithAvailabilityStatus = {};
                 
                 const tileIdentifier = /dune.*two/;
-                desiredImaxScreeningDates.push('20240411');
-                desiredImaxScreeningDates.push('20240412');
-                desiredImaxScreeningDates.push('20240413');
-                desiredImaxScreeningDates.push('20240414');
-                desiredImaxScreeningDates.push('20240415');
-                desiredImaxScreeningDates.push('20240416');
-                desiredImaxScreeningDates.push('20240417');
 
                 prepareLookup();
                 lookupAvailabilityStatusOfDesiredImaxScreeningDates();
