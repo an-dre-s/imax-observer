@@ -24,7 +24,7 @@ async function observeVabaliDates() {
 
     async function observationCycle() {
         try {
-            await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+            await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
             await page.waitForSelector('#anwendungsDatumChooser');
 
             try {
@@ -71,7 +71,7 @@ async function observeVabaliDates() {
                 console.error('TimeoutError:', error.message);
                 return;
             }
-            alertAdmin(exception);
+            alertAdmin(error);
             clearInterval(intervalId);
         }
     }
