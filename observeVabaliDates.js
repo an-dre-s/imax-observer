@@ -24,6 +24,7 @@ async function observeVabaliDates() {
 
     async function observationCycle() {
         try {
+            console.log('start cycle');
             await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
             await page.waitForSelector('#anwendungsDatumChooser');
 
