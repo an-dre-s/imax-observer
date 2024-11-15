@@ -6,102 +6,71 @@ let intervalId;
 async function observeVabaliDates() {
     stopPreviousObservation();
     sendMail(process.env.ADMIN_MAIL, 'service started', 'service has been started');
+    console.log('service started');
 
-    const browser = await puppeteer.launch({ timeout: 60000 });
+    const browser = await puppeteer.launch({ slowMo: 100 });
+
     const page = await browser.newPage();
+    page.setDefaultTimeout(5000);
+
     const url = 'https://www.vabali.de/berlin/reservierung/';
+
+    const browserEnv = {
+        HOUR_START: parseInt(process.env.HOUR_START),
+        HOUR_END: parseInt(process.env.HOUR_END),
+    }
 
     intervalId = setInterval(observationCycle, 1 * 60 * 1000);
 
     async function observationCycle() {
         try {
-            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            await page.goto(url, { waitUntil: 'networkidle2' });
+            await page.waitForSelector('#anwendungsDatumChooser');
 
-            console.log(String(new Date()));
-
-            const browserEnv = {
-                NUMBER_PERSONS: parseInt(process.env.NUMBER_PERSONS),
-                HOUR_START: parseInt(process.env.HOUR_START),
-                HOUR_END: parseInt(process.env.HOUR_END),
+            try {
+                await page.click('#CybotCookiebotDialogBodyButtonDecline'); // Decline cookies
+            } catch (error) {
             }
 
-            const uhrzeiten = await page.evaluate(async (env) => {
-                initJquery();
-                await delay(2000);
-
-                declineCookies();
-                await delay(500);
-
-                clickDay();
-                await delay(500);
-
-                clickReservierung();
-                await delay(500);
-
-                setPersonenzahl();
-                await delay(500);
-
-                sendPersonenzahl();
-                await delay(1000);
-
-                return filterUhrzeiten();
-
-                function initJquery() {
-                    var script = document.createElement('script');
-                    script.src = 'https://code.jquery.com/jquery-3.6.0.min.js'; // Specify the version you need
-                    script.type = 'text/javascript';
-                    script.onload = function () {
-                        console.log('jQuery loaded:', $.fn.jquery);
-                    };
-                    document.getElementsByTagName('head')[0].appendChild(script);
+            await page.waitForSelector('#anwendungsDatumChooser');
+            await page.evaluate(() => {
+                const element = Array.from(document.querySelectorAll('.ui-datepicker-week-end a'))
+                    .find(el => el.textContent.trim() === '17');
+                if (element) {
+                    element.parentElement.click();
                 }
+            });
 
-                function declineCookies() {
-                    $('#CybotCookiebotDialogBodyButtonDecline').trigger('click');
-                }
+            await page.waitForSelector('.stepContent .anwendung');
+            await page.click('.stepContent .anwendung');
 
-                function clickDay() {
-                    $('.ui-datepicker-week-end a').filter(function () { return $(this).text() === '17'; }).closest('.ui-datepicker-week-end').trigger('click');
-                }
+            await page.waitForSelector('#personenanzahl select');
+            await page.select('#personenanzahl select', process.env.NUMBER_PERSONS);
 
-                function clickReservierung() {
-                    $('.stepContent .anwendung').trigger('click')
-                }
+            await page.waitForSelector('#personenanzahl button');
+            await page.click('#personenanzahl button');
 
-                function setPersonenzahl() {
-                    $('#personenanzahl select').val(env.NUMBER_PERSONS);
-                }
-
-                function sendPersonenzahl() {
-                    $('#personenanzahl button').trigger('click');
-                }
-
-                function filterUhrzeiten() {
-                    return $('#uhrzeiten .stepContent li:not([disabled])')
-                        .filter(function () {
-                            const hour = parseInt($(this).attr('id').substring(1, 3));
-                            return env.HOUR_START <= hour && hour <= env.HOUR_END;
-                        })
-                        .map(function () {
-                            return $(this).attr('id').substring(1);
-                        })
-                        .toArray();
-                }
-
-                function delay(ms) {
-                    return new Promise(resolve => setTimeout(resolve, ms));
-                }
+            await page.waitForSelector('#uhrzeiten');
+            const uhrzeiten = await page.evaluate((env) => {
+                return Array.from(document.querySelectorAll('#uhrzeiten .stepContent li:not([disabled])'))
+                    .filter(element => {
+                        const hour = parseInt(element.id.substring(1, 3));
+                        return env.HOUR_START <= hour && hour <= env.HOUR_END;
+                    })
+                    .map(element => element.id.substring(1));
             }, browserEnv);
 
             if (uhrzeiten.length) {
                 notifyUsers(uhrzeiten);
-                console.log('desired hours available')
                 clearInterval(intervalId);
             } else {
-                console.log('could not find desired hours')
-
+                console.log('No desired hours found');
             }
-        } catch (exception) {
+        } catch (error) {
+            if (error.name === 'TimeoutError') {
+                console.error('TimeoutError:', error.message);
+                return;
+            }
             alertAdmin(exception);
             clearInterval(intervalId);
         }
