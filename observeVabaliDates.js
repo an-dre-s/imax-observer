@@ -74,7 +74,7 @@ async function observeVabaliDates() {
                     return $('#uhrzeiten .stepContent li:not([disabled])')
                     .filter(function() {
                         const hour = parseInt($(this).attr('id').substring(1,3));
-                        return 19 <= hour && hour <= 20;
+                        return 11 <= hour && hour <= 14;
                     })
                     .map(function() {
                         return $(this).attr('id').substring(1);
@@ -115,7 +115,9 @@ function alertAdmin(error) {
 
 function notifyUsers(uhrzeiten) {
     const USER_MAILS = JSON.parse(process.env.USER_MAILS);
-    USER_MAILS.forEach((mail) => sendMail(mail, 'desired vabali hours available', `Available slots: ${uhrzeiten.join(', ')}.\nCheck https://www.vabali.de/berlin/reservierung/ for further details.`));
+    const messageSubject = 'desired vabali hours available'
+    const messageText = `Available slots: ${uhrzeiten.join(', ')}.\nCheck https://www.vabali.de/berlin/reservierung/ for further details.`
+    USER_MAILS.forEach((mail) => sendMail(mail, messageSubject, messageText));
 }
 
 function sendMail(recipient, subject, text) {
