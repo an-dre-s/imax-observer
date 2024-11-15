@@ -11,7 +11,7 @@ async function observeVabaliDates() {
     const page = await browser.newPage();
     const url = 'https://www.vabali.de/berlin/reservierung/';
 
-    intervalId = setInterval(observationCycle, 2 * 60 * 1000);
+    intervalId = setInterval(observationCycle, 1 * 60 * 1000);
 
     async function observationCycle() {
         try {
@@ -63,7 +63,7 @@ async function observeVabaliDates() {
                 }
                 
                 function setPersonenzahl() {
-                    $('#personenanzahl select').val(2);
+                    $('#personenanzahl select').val(1);
                 }
                 
                 function sendPersonenzahl() {
@@ -74,7 +74,7 @@ async function observeVabaliDates() {
                     return $('#uhrzeiten .stepContent li:not([disabled])')
                     .filter(function() {
                         const hour = parseInt($(this).attr('id').substring(1,3));
-                        return 19 <= hour && hour <= 21;
+                        return 8 <= hour && hour <= 14;
                     })
                     .map(function() {
                         return $(this).attr('id').substring(1);
