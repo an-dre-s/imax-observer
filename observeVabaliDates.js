@@ -21,7 +21,7 @@ async function observeVabaliDates() {
 
             const uhrzeiten = await page.evaluate(async () => {
                 initJquery();
-                await delay(1000);
+                await delay(2000);
                 
                 declineCookies();
                 await delay(500);
@@ -36,7 +36,7 @@ async function observeVabaliDates() {
                 await delay(500);
                 
                 sendPersonenzahl();
-                await delay(500);
+                await delay(1000);
                 
                 return filterUhrzeiten();
                 
