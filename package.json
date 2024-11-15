@@ -6,6 +6,6 @@
     "puppeteer": "^22.6.3"
   },
   "scripts": {
-    "start": "node observeImaxScreeningDates.js"
+    "start": "node observeVabaliDates.js"
   }
 }
