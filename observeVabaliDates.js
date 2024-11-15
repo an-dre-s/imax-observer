@@ -74,7 +74,7 @@ async function observeVabaliDates() {
                     return $('#uhrzeiten .stepContent li:not([disabled])')
                     .filter(function() {
                         const hour = parseInt($(this).attr('id').substring(1,3));
-                        return 11 <= hour && hour <= 14;
+                        return 19 <= hour && hour <= 21;
                     })
                     .map(function() {
                         return $(this).attr('id').substring(1);
