@@ -1,10 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const observeVabaliDates = require('./observeVabaliDates');
+const {observeVabaliDates, stopObservation } = require('./observeVabaliDates');
 
 app.get("/", (req, res) => res.type('html').send(html));
 app.get('/start', () => observeVabaliDates());
+app.get('/stop', () => stopObservation());
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
