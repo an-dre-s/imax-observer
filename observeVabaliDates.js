@@ -62,8 +62,8 @@ async function observeVabaliDates() {
             }, browserEnv);
 
             if (uhrzeiten.length) {
+                console.log(uhrzeiten);
                 notifyUsers(uhrzeiten);
-                clearInterval(intervalId);
             } else {
                 console.log('No desired hours found');
             }
