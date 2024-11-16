@@ -6,7 +6,7 @@ let browser;
 let page;
 
 async function observeVabaliDates() {
-    await stopObservation();
+    stopPreviousObservation();
     sendMail(process.env.ADMIN_MAIL, 'service started', 'https://dashboard.render.com/web/srv-co8348uv3ddc73b7ahvg/logs');
     console.log('service started');
 
@@ -22,44 +22,35 @@ async function observeVabaliDates() {
         HOUR_END: parseInt(process.env.HOUR_END),
     }
 
-    try {
-        await prepareStuff();
-        intervalId = setInterval(observationCycle, 1 * 60 * 1000);
-    } catch (error) {
-        console.log(error);
-        alertAdmin(error);
-        await stopObservation();
-    }
-
-
-    async function prepareStuff() {
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
-        await page.waitForSelector('#anwendungsDatumChooser');
-
-        await page.click('#CybotCookiebotDialogBodyButtonDecline'); // Decline cookies
-
-        await page.waitForSelector('#anwendungsDatumChooser');
-        await page.evaluate(() => {
-            const element = Array.from(document.querySelectorAll('.ui-datepicker-week-end a'))
-                .find(el => el.textContent.trim() === '17');
-            if (element) {
-                element.parentElement.click();
-            }
-        });
-
-        await page.waitForSelector('.stepContent .anwendung');
-        await page.click('.stepContent .anwendung');
-
-        await page.waitForSelector('#personenanzahl select');
-        await page.select('#personenanzahl select', process.env.NUMBER_PERSONS);
-
-        await page.waitForSelector('#personenanzahl button');
-    }
+    intervalId = setInterval(observationCycle, 1 * 60 * 1000);
 
     async function observationCycle() {
         try {
             console.log('start cycle');
+            await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
+            await page.waitForSelector('#anwendungsDatumChooser');
 
+            try {
+                await page.click('#CybotCookiebotDialogBodyButtonDecline'); // Decline cookies
+            } catch (error) {
+            }
+
+            await page.waitForSelector('#anwendungsDatumChooser');
+            await page.evaluate(() => {
+                const element = Array.from(document.querySelectorAll('.ui-datepicker-week-end a'))
+                    .find(el => el.textContent.trim() === '17');
+                if (element) {
+                    element.parentElement.click();
+                }
+            });
+
+            await page.waitForSelector('.stepContent .anwendung');
+            await page.click('.stepContent .anwendung');
+
+            await page.waitForSelector('#personenanzahl select');
+            await page.select('#personenanzahl select', process.env.NUMBER_PERSONS);
+
+            await page.waitForSelector('#personenanzahl button');
             await page.click('#personenanzahl button');
 
             await page.waitForSelector('#uhrzeiten');
@@ -80,7 +71,7 @@ async function observeVabaliDates() {
             }
         } catch (error) {
             if (error.name === 'TimeoutError') {
-                console.error(error);
+                console.error('TimeoutError:', error.message);
                 return;
             }
             alertAdmin(error);
