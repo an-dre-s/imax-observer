@@ -6,7 +6,7 @@ let browser;
 let page;
 
 async function observeVabaliDates() {
-    stopPreviousObservation();
+    stopObservation();
     sendMail(process.env.ADMIN_MAIL, 'service started', 'https://dashboard.render.com/web/srv-co8348uv3ddc73b7ahvg/logs');
     console.log('service started');
 
@@ -106,6 +106,7 @@ function notifyUsers(uhrzeiten) {
 }
 
 function sendMail(recipient, subject, text) {
+    return;
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
