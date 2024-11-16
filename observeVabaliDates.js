@@ -67,23 +67,28 @@ async function observeVabaliDates() {
                 console.log(uhrzeiten);
                 notifyUsers(uhrzeiten);
             } else {
-                console.log('No desired hours found');
+                console.log('No desired slots found');
             }
+
         } catch (error) {
             if (error.name === 'TimeoutError') {
                 console.error('TimeoutError:', error.message);
                 return;
             }
-            alertAdmin(error);
-            await stopObservation();
+            await handleError(error);
         }
     }
 }
 
-async function stopObservation() {
-    console.log('stop observation');
+async function handleError(error) {
+    console.error(error);
+    alertAdmin(error);
+    await stopObservation();
+}
 
+async function stopObservation() {
     if (intervalId) {
+        console.log('clear interval');
         clearInterval(intervalId);
     }
 
@@ -94,7 +99,6 @@ async function stopObservation() {
 }
 
 function alertAdmin(error) {
-    console.error(error);
     sendMail(process.env.ADMIN_MAIL, 'Error in vabali observer. Observatio aborted.', error.message)
 }
 
