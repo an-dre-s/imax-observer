@@ -106,7 +106,6 @@ function notifyUsers(uhrzeiten) {
 }
 
 function sendMail(recipient, subject, text) {
-    return;
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
