@@ -1,10 +1,10 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const {observeVabaliDates, stopObservation } = require('./observeVabaliDates');
+const { observeSwitchBundle, stopObservation } = require('./observeSwitchBundle');
 
 app.get("/", (req, res) => res.type('html').send(html));
-app.get('/start', () => observeVabaliDates());
+app.get('/start', () => observeSwitchBundle());
 app.get('/stop', () => stopObservation());
 
 const PORT = process.env.PORT || 3000;
@@ -17,11 +17,11 @@ const html = `
 <!DOCTYPE html>
 <html>
   <head>
-    <title>vabali observer</title>
+    <title>switch bundle observer</title>
   </head>
   <body>
     <section>
-      Hello to vabali observer
+      Hello to switch bundle observer
     </section>
   </body>
 </html>

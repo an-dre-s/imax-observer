@@ -5,7 +5,7 @@ let intervalId;
 let browser;
 let page;
 
-async function observeVabaliDates() {
+async function observeSwitchBundle() {
     stopObservation();
     sendMail(process.env.ADMIN_MAIL, 'service started', 'https://dashboard.render.com/web/srv-co8348uv3ddc73b7ahvg/logs');
     console.log('service started');
@@ -15,7 +15,7 @@ async function observeVabaliDates() {
     page = await browser.newPage();
     page.setDefaultTimeout(5000);
 
-    const url = 'https://www.vabali.de/berlin/reservierung/';
+    const url = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276';
 
     const browserEnv = {
         HOUR_START: parseInt(process.env.HOUR_START),
@@ -28,46 +28,16 @@ async function observeVabaliDates() {
         try {
             console.log('start cycle');
             await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
-            await page.waitForSelector('#anwendungsDatumChooser');
+            await page.waitForSelector('.pdp_delivery--with-article-options');
 
-            try {
-                await page.click('#CybotCookiebotDialogBodyButtonDecline'); // Decline cookies
-            } catch (error) {
-            }
-
-            await page.waitForSelector('#anwendungsDatumChooser');
-            await page.evaluate(() => {
-                const element = Array.from(document.querySelectorAll('.ui-datepicker-week-end a'))
-                    .find(el => el.textContent.trim() === '17');
-                if (element) {
-                    element.parentElement.click();
-                }
+            const bundleAvailable = await page.evaluate(() => {
+                return ($('.pdp_delivery__soldout-message') === null)
             });
 
-            await page.waitForSelector('.stepContent .anwendung');
-            await page.click('.stepContent .anwendung');
-
-            await page.waitForSelector('#personenanzahl select');
-            await page.select('#personenanzahl select', process.env.NUMBER_PERSONS);
-
-            await page.waitForSelector('#personenanzahl button');
-            await page.click('#personenanzahl button');
-
-            await page.waitForSelector('#uhrzeiten');
-            const uhrzeiten = await page.evaluate((env) => {
-                return Array.from(document.querySelectorAll('#uhrzeiten .stepContent li:not([disabled])'))
-                    .filter(element => {
-                        const hour = parseInt(element.id.substring(1, 3));
-                        return env.HOUR_START <= hour && hour <= env.HOUR_END;
-                    })
-                    .map(element => element.id.substring(1));
-            }, browserEnv);
-
-            if (uhrzeiten.length) {
-                console.log(uhrzeiten);
-                notifyUsers(uhrzeiten);
+            if (bundleAvailable) {
+                notifyUsers();
             } else {
-                console.log('No desired slots found');
+                console.log('bundle not yet available');
             }
 
         } catch (error) {
@@ -99,13 +69,13 @@ async function stopObservation() {
 }
 
 function alertAdmin(error) {
-    sendMail(process.env.ADMIN_MAIL, 'Error in vabali observer. Observatio aborted.', error.message)
+    sendMail(process.env.ADMIN_MAIL, 'Error in otto observer. Observatio aborted.', error.message)
 }
 
-function notifyUsers(uhrzeiten) {
+function notifyUsers() {
     const USER_MAILS = JSON.parse(process.env.USER_MAILS);
-    const messageSubject = 'desired vabali hours available'
-    const messageText = `Available slots: ${uhrzeiten.join(', ')}.\nCheck https://www.vabali.de/berlin/reservierung/ for further details.`
+    const messageSubject = 'bundle is available'
+    const messageText = "https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276"
     USER_MAILS.forEach((mail) => sendMail(mail, messageSubject, messageText));
 }
 
@@ -134,4 +104,4 @@ function sendMail(recipient, subject, text) {
     });
 }
 
-module.exports = { observeVabaliDates, stopObservation };
+module.exports = { observeSwitchBundle, stopObservation };
