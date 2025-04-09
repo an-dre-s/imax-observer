@@ -1,3 +1,6 @@
+# install app
+`npm install`
+
 # run app
 `node ./app.js`
 

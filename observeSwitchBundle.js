@@ -22,7 +22,7 @@ async function observeSwitchBundle() {
         HOUR_END: parseInt(process.env.HOUR_END),
     }
 
-    intervalId = setInterval(observationCycle, 1 * 60 * 1000);
+    intervalId = setInterval(observationCycle, 1 * 10 * 1000);
 
     async function observationCycle() {
         try {
@@ -31,7 +31,7 @@ async function observeSwitchBundle() {
             await page.waitForSelector('.pdp_delivery--with-article-options');
 
             const bundleAvailable = await page.evaluate(() => {
-                return ($('.pdp_delivery__soldout-message') === null)
+                return (document.getElementsByClassName('pdp_delivery__soldout-message').length === 0)
             });
 
             if (bundleAvailable) {
