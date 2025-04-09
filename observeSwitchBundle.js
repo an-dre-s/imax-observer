@@ -13,7 +13,7 @@ async function observeSwitchBundle() {
     browser = await puppeteer.launch({ slowMo: 100 });
 
     page = await browser.newPage();
-    page.setDefaultTimeout(60000);
+    page.setDefaultTimeout(5000);
 
     const url = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276';
 
@@ -22,7 +22,7 @@ async function observeSwitchBundle() {
         HOUR_END: parseInt(process.env.HOUR_END),
     }
 
-    intervalId = setInterval(observationCycle, 1 * 120 * 1000);
+    intervalId = setInterval(observationCycle, 1 * 30 * 1000);
 
     async function observationCycle() {
         try {
