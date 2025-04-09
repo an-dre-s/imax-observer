@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const nodemailer = require('nodemailer');
+const player = require('play-sound')();
 
 let intervalId;
 let browser;
@@ -13,7 +14,7 @@ async function observeSwitchBundle() {
     browser = await puppeteer.launch({ slowMo: 100 });
 
     page = await browser.newPage();
-    page.setDefaultTimeout(40000);
+    page.setDefaultTimeout(5000);
 
     const url = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276';
 
@@ -22,7 +23,7 @@ async function observeSwitchBundle() {
         HOUR_END: parseInt(process.env.HOUR_END),
     }
 
-    intervalId = setInterval(observationCycle, 1 * 60 * 1000);
+    intervalId = setInterval(observationCycle, 1 * 10 * 1000);
 
     async function observationCycle() {
         try {
@@ -36,6 +37,7 @@ async function observeSwitchBundle() {
 
             if (bundleAvailable) {
                 notifyUsers();
+                playAlarm();
             } else {
                 console.log('bundle not yet available');
             }
@@ -100,6 +102,16 @@ function sendMail(recipient, subject, text) {
             console.log(error);
         } else {
             console.log('Email sent: ' + info.response);
+        }
+    });
+}
+
+function playAlarm() {
+    player.play('./data/alarm.wav', function (err) {
+        if (err) {
+            console.log('Error playing sound: ', err);
+        } else {
+            console.log('Sound played successfully!');
         }
     });
 }
