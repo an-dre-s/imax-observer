@@ -8,7 +8,7 @@ let page;
 
 async function observeSwitchBundle() {
     stopObservation();
-    sendMail(process.env.ADMIN_MAIL, 'service started', 'https://dashboard.render.com/web/srv-co8348uv3ddc73b7ahvg/logs');
+    // sendMail(process.env.ADMIN_MAIL, 'service started', 'https://dashboard.render.com/web/srv-co8348uv3ddc73b7ahvg/logs');
     console.log('service started');
 
     browser = await puppeteer.launch({ slowMo: 100 });
@@ -36,7 +36,7 @@ async function observeSwitchBundle() {
             });
 
             if (bundleAvailable) {
-                notifyUsers();
+                // notifyUsers();
                 playAlarm();
             } else {
                 console.log('bundle not yet available');
