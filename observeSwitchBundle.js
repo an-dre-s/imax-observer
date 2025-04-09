@@ -28,7 +28,7 @@ async function observeSwitchBundle() {
         try {
             console.log('start cycle');
             await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
-            await page.waitForSelector('.pdp_delivery--with-article-options');
+            // await page.waitForSelector('.pdp_delivery--with-article-options');
 
             const bundleAvailable = await page.evaluate(() => {
                 return (document.getElementsByClassName('pdp_delivery__soldout-message').length === 0)
