@@ -10,31 +10,28 @@ async function observeSwitchBundle() {
     sendMail(process.env.ADMIN_MAIL, 'service started', 'https://dashboard.render.com/web/srv-co8348uv3ddc73b7ahvg/logs');
     console.log('service started');
 
-    browser = await puppeteer.launch({ slowMo: 100 });
+    browser = await puppeteer.launch();
 
     page = await browser.newPage();
     page.setDefaultTimeout(5000);
 
-    const url = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276';
+    const url = `https://www.otto.de/suche/switch%202/?kategorien~sind=spielekonsolen&preis-in-eur~ab=${process.env.PRICE_START}&preis-in-eur~bis=${process.env.PRICE_END}&verkaeufer=otto`;
 
-    const browserEnv = {
-        HOUR_START: parseInt(process.env.HOUR_START),
-        HOUR_END: parseInt(process.env.HOUR_END),
-    }
-
-    intervalId = setInterval(observationCycle, 1 * 30 * 1000);
+    intervalId = setInterval(observationCycle, 1 * 60 * 1000);
 
     async function observationCycle() {
         try {
             console.log('start cycle');
-            await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
-            await page.waitForSelector('.pdp_delivery--with-article-options');
+            await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+            await page.waitForSelector('#reptile-search-result');
 
             const bundleAvailable = await page.evaluate(() => {
-                return (document.getElementsByClassName('pdp_delivery__soldout-message').length === 0)
+                return (document.getElementsByClassName('reptile_tilelist__itemCount').length)
             });
 
             if (bundleAvailable) {
+                console.log('bundle available');
+                stopObservation();
                 notifyUsers();
             } else {
                 console.log('bundle not yet available');
