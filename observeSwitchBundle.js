@@ -34,7 +34,7 @@ async function observeSwitchBundle() {
                 stopObservation();
                 notifyUsers();
             } else {
-                console.log('bundle not yet available');
+                console.log(`no results found for price between ${process.env.PRICE_START}€ and ${process.env.PRICE_END}€.`);
             }
 
         } catch (error) {
