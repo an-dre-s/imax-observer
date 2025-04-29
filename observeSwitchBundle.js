@@ -10,7 +10,9 @@ async function observeSwitchBundle() {
     sendMail(process.env.ADMIN_MAIL, 'service started', 'https://dashboard.render.com/web/srv-co8348uv3ddc73b7ahvg/logs');
     console.log('service started');
 
-    browser = await puppeteer.launch({headless: false});
+    browser = await puppeteer.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
 
     page = await browser.newPage();
     page.setDefaultTimeout(15000);
