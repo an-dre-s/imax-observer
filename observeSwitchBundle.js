@@ -19,7 +19,7 @@ async function observeSwitchBundle() {
 
     const URL_PRODUCT = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276'
 
-    intervalId = setInterval(observationCycle, 1 * 10 * 1000);
+    intervalId = setInterval(observationCycle, 1 * 30 * 1000);
 
     async function observationCycle() {
         try {
