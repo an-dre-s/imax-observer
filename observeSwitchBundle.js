@@ -15,26 +15,27 @@ async function observeSwitchBundle() {
     page = await browser.newPage();
     page.setDefaultTimeout(5000);
 
-    const url = `https://www.otto.de/suche/switch%202/?kategorien~sind=spielekonsolen&preis-in-eur~ab=${process.env.PRICE_START}&preis-in-eur~bis=${process.env.PRICE_END}&verkaeufer=otto`;
+    const URL_SEARCH = `https://www.otto.de/suche/switch%202/?kategorien~sind=spielekonsolen&preis-in-eur~ab=${process.env.PRICE_START}&preis-in-eur~bis=${process.env.PRICE_END}&verkaeufer=otto`;
+    const URL_PRODUCT = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276/'
 
     intervalId = setInterval(observationCycle, 1 * 60 * 1000);
 
     async function observationCycle() {
         try {
-            console.log('start cycle');
-            await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
-            await page.waitForSelector('#reptile-search-result');
+            console.log('Starting cycle.');
 
-            const bundleAvailable = await page.evaluate(() => {
-                return (document.getElementsByClassName('reptile_tilelist__itemCount').length)
-            });
+            let bundleAvailable = await checkSearch();
+
+            if (!bundleAvailable) {
+                bundleAvailable = await checkProduct();
+            }
 
             if (bundleAvailable) {
-                console.log('bundle available');
+                console.log('Bundle available.');
                 stopObservation();
                 notifyUsers();
             } else {
-                console.log(`no results found for price between ${process.env.PRICE_START}€ and ${process.env.PRICE_END}€.`);
+                console.log('Bundle not available.')
             }
 
         } catch (error) {
@@ -45,7 +46,44 @@ async function observeSwitchBundle() {
             await handleError(error);
         }
     }
+
+    async function checkSearch() {
+        console.log('Checking search page.');
+
+        await page.goto(URL_SEARCH, { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.waitForSelector('#reptile-search-result');
+    
+        const bundleAvailable = await page.evaluate(() => {
+            return document.getElementsByClassName('reptile_tilelist__itemCount').length;
+        });
+
+        if (!bundleAvailable) {
+            console.log(`No results found for price between ${process.env.PRICE_START}€ and ${process.env.PRICE_END}€.`);
+        }
+
+        return bundleAvailable;
+    }
+
+    async function checkProduct() {
+        console.log('Checking product page.');
+
+        await page.goto(URL_PRODUCT, { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.waitForSelector('#pl_logo_otto');
+        
+        const bundleAvailable = await page.evaluate(() => {
+            const redirectBanner = document.querySelector('.pdp_redirect-message');
+            return redirectBanner ? window.getComputedStyle(redirectBanner).display === 'none' : true;
+        });
+
+        if(!bundleAvailable) {
+            console.log('Product page not available.');
+        }
+
+        return bundleAvailable;
+    }
 }
+
+
 
 async function handleError(error) {
     console.error(error);
