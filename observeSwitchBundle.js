@@ -14,10 +14,10 @@ async function observeSwitchBundle() {
     browser = await puppeteer.launch();
 
     pageSearch = await browser.newPage();
-    pageSearch.setDefaultTimeout(5000);
+    pageSearch.setDefaultTimeout(15000);
 
     pageProduct = await browser.newPage();
-    pageProduct.setDefaultTimeout(5000);
+    pageProduct.setDefaultTimeout(15000);
 
     const URL_SEARCH = `https://www.otto.de/suche/switch%202/?kategorien~sind=spielekonsolen&preis-in-eur~ab=${process.env.PRICE_START}&preis-in-eur~bis=${process.env.PRICE_END}&verkaeufer=otto`;
     const URL_PRODUCT = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276/'
