@@ -13,13 +13,13 @@ async function observeSwitchBundle() {
     browser = await puppeteer.launch();
 
     page = await browser.newPage();
-    page.setDefaultTimeout(15000);
+    page.setDefaultTimeout(5000);
 
     let search = true;
 
     const URL_PRODUCT = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276'
 
-    intervalId = setInterval(observationCycle, 1 * 60 * 1000);
+    intervalId = setInterval(observationCycle, 1 * 10 * 1000);
 
     async function observationCycle() {
         try {
@@ -52,9 +52,8 @@ async function observeSwitchBundle() {
     async function checkProduct() {
         console.log('Checking product page.');
 
-        await page.goto(URL_PRODUCT, { waitUntil: 'networkidle2', timeout: 30000 });
-        // await page.waitForSelector('.pdp_short-info');
-        await page.waitForSelector('#serviceLink');
+        await page.goto(URL_PRODUCT, { waitUntil: 'networkidle2' });
+        await page.waitForSelector('.pdp_short-info');
 
         const bundleAvailable = await page.evaluate(() => {
             const redirectBanner = document.querySelector('.pdp_redirect-message');
