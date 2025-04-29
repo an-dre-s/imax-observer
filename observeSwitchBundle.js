@@ -28,11 +28,11 @@ async function observeSwitchBundle() {
 
             let bundleAvailable;
 
-            if(search) {
-                bundleAvailable = await checkSearch();
-            } else {
+            // if(search) {
+                // bundleAvailable = await checkSearch();
+            // } else {
                 bundleAvailable = await checkProduct();
-            }
+            // }
 
             search = !search;
 
@@ -74,7 +74,7 @@ async function observeSwitchBundle() {
         console.log('Checking product page.');
 
         await page.goto(URL_PRODUCT, { waitUntil: 'networkidle2', timeout: 30000 });
-        await page.waitForSelector('#pl_logo_otto');
+        await page.waitForSelector('.pdp_short-info');
         
         const bundleAvailable = await page.evaluate(() => {
             const redirectBanner = document.querySelector('.pdp_redirect-message');
