@@ -18,7 +18,7 @@ async function observeSwitchBundle() {
     let search = true;
 
     const URL_SEARCH = `https://www.otto.de/suche/switch%202/?kategorien~sind=spielekonsolen&preis-in-eur~ab=${process.env.PRICE_START}&preis-in-eur~bis=${process.env.PRICE_END}&verkaeufer=otto`;
-    const URL_PRODUCT = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276/'
+    const URL_PRODUCT = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276'
 
     intervalId = setInterval(observationCycle, 1 * 60 * 1000);
 
@@ -29,9 +29,9 @@ async function observeSwitchBundle() {
             let bundleAvailable;
 
             // if(search) {
-                bundleAvailable = await checkSearch();
+                // bundleAvailable = await checkSearch();
             // } else {
-                // bundleAvailable = await checkProduct();
+                bundleAvailable = await checkProduct();
             // }
 
             search = !search;
