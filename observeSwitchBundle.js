@@ -10,20 +10,13 @@ async function observeSwitchBundle() {
     sendMail(process.env.ADMIN_MAIL, 'service started', 'https://dashboard.render.com/web/srv-co8348uv3ddc73b7ahvg/logs');
     console.log('service started');
 
-    browser = await puppeteer.launch({
-        args: [
-            '--remote-debugging-port=9222',
-            '--enable-logging',
-            '--v=1'
-        ]
-    });
+    browser = await puppeteer.launch();
 
     page = await browser.newPage();
     page.setDefaultTimeout(15000);
 
     let search = true;
 
-    const URL_SEARCH = `https://www.otto.de/suche/switch%202/?kategorien~sind=spielekonsolen&preis-in-eur~ab=${process.env.PRICE_START}&preis-in-eur~bis=${process.env.PRICE_END}&verkaeufer=otto`;
     const URL_PRODUCT = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276'
 
     intervalId = setInterval(observationCycle, 1 * 60 * 1000);
@@ -34,11 +27,7 @@ async function observeSwitchBundle() {
 
             let bundleAvailable;
 
-            // if(search) {
-            // bundleAvailable = await checkSearch();
-            // } else {
             bundleAvailable = await checkProduct();
-            // }
 
             search = !search;
 
@@ -52,29 +41,12 @@ async function observeSwitchBundle() {
 
         } catch (error) {
             if (error.name === 'TimeoutError') {
+                sendMail(process.env.ADMIN_MAIL, 'timeout error', 'https://dashboard.render.com/web/srv-co8348uv3ddc73b7ahvg/logs');
                 console.error('TimeoutError:', error.message);
                 return;
             }
             await handleError(error);
         }
-    }
-
-    async function checkSearch() {
-        console.log('Checking search page.');
-
-        await page.goto(URL_SEARCH, { waitUntil: 'networkidle2', timeout: 30000 });
-        // await page.waitForSelector('#reptile-search-result');
-        await page.waitForSelector('#serviceLink');
-
-        const bundleAvailable = await page.evaluate(() => {
-            return document.getElementsByClassName('reptile_tilelist__itemCount').length;
-        });
-
-        if (!bundleAvailable) {
-            console.log(`No results found for price between ${process.env.PRICE_START}€ and ${process.env.PRICE_END}€.`);
-        }
-
-        return bundleAvailable;
     }
 
     async function checkProduct() {
@@ -96,8 +68,6 @@ async function observeSwitchBundle() {
         return bundleAvailable;
     }
 }
-
-
 
 async function handleError(error) {
     console.error(error);
