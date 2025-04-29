@@ -3,7 +3,8 @@ const nodemailer = require('nodemailer');
 
 let intervalId;
 let browser;
-let page;
+let pageSearch;
+let pageProduct;
 
 async function observeSwitchBundle() {
     stopObservation();
@@ -12,8 +13,11 @@ async function observeSwitchBundle() {
 
     browser = await puppeteer.launch();
 
-    page = await browser.newPage();
-    page.setDefaultTimeout(5000);
+    pageSearch = await browser.newPage();
+    pageSearch.setDefaultTimeout(5000);
+
+    pageProduct = await browser.newPage();
+    pageProduct.setDefaultTimeout(5000);
 
     const URL_SEARCH = `https://www.otto.de/suche/switch%202/?kategorien~sind=spielekonsolen&preis-in-eur~ab=${process.env.PRICE_START}&preis-in-eur~bis=${process.env.PRICE_END}&verkaeufer=otto`;
     const URL_PRODUCT = 'https://www.otto.de/p/nintendo-switch-switch-2-plus-mario-kart-world-nintendo-switch-2-1970649276/'
@@ -50,10 +54,10 @@ async function observeSwitchBundle() {
     async function checkSearch() {
         console.log('Checking search page.');
 
-        await page.goto(URL_SEARCH, { waitUntil: 'networkidle2', timeout: 30000 });
-        await page.waitForSelector('#reptile-search-result');
+        await pageSearch.goto(URL_SEARCH, { waitUntil: 'networkidle2', timeout: 30000 });
+        await pageSearch.waitForSelector('#reptile-search-result');
     
-        const bundleAvailable = await page.evaluate(() => {
+        const bundleAvailable = await pageSearch.evaluate(() => {
             return document.getElementsByClassName('reptile_tilelist__itemCount').length;
         });
 
@@ -67,10 +71,10 @@ async function observeSwitchBundle() {
     async function checkProduct() {
         console.log('Checking product page.');
 
-        await page.goto(URL_PRODUCT, { waitUntil: 'networkidle2', timeout: 30000 });
-        await page.waitForSelector('#pl_logo_otto');
+        await pageProduct.goto(URL_PRODUCT, { waitUntil: 'networkidle2', timeout: 30000 });
+        await pageProduct.waitForSelector('#pl_logo_otto');
         
-        const bundleAvailable = await page.evaluate(() => {
+        const bundleAvailable = await pageProduct.evaluate(() => {
             const redirectBanner = document.querySelector('.pdp_redirect-message');
             return redirectBanner ? window.getComputedStyle(redirectBanner).display === 'none' : true;
         });
