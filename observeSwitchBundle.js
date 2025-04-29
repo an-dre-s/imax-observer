@@ -11,7 +11,11 @@ async function observeSwitchBundle() {
     console.log('service started');
 
     browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        args: [
+            '--remote-debugging-port=9222',
+            '--enable-logging',
+            '--v=1'
+        ]
     });
 
     page = await browser.newPage();
@@ -31,9 +35,9 @@ async function observeSwitchBundle() {
             let bundleAvailable;
 
             // if(search) {
-                // bundleAvailable = await checkSearch();
+            // bundleAvailable = await checkSearch();
             // } else {
-                bundleAvailable = await checkProduct();
+            bundleAvailable = await checkProduct();
             // }
 
             search = !search;
@@ -61,7 +65,7 @@ async function observeSwitchBundle() {
         await page.goto(URL_SEARCH, { waitUntil: 'networkidle2', timeout: 30000 });
         // await page.waitForSelector('#reptile-search-result');
         await page.waitForSelector('#serviceLink');
-    
+
         const bundleAvailable = await page.evaluate(() => {
             return document.getElementsByClassName('reptile_tilelist__itemCount').length;
         });
@@ -79,13 +83,13 @@ async function observeSwitchBundle() {
         await page.goto(URL_PRODUCT, { waitUntil: 'networkidle2', timeout: 30000 });
         // await page.waitForSelector('.pdp_short-info');
         await page.waitForSelector('#serviceLink');
-        
+
         const bundleAvailable = await page.evaluate(() => {
             const redirectBanner = document.querySelector('.pdp_redirect-message');
             return redirectBanner ? window.getComputedStyle(redirectBanner).display === 'none' : true;
         });
 
-        if(!bundleAvailable) {
+        if (!bundleAvailable) {
             console.log('Product page not available.');
         }
 
