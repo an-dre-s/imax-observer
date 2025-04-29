@@ -4,7 +4,6 @@ const nodemailer = require('nodemailer');
 let intervalId;
 let browser;
 let page;
-let page;
 
 async function observeSwitchBundle() {
     stopObservation();
